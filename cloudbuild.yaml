@@ -1,0 +1,14 @@
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+          # Authenticate with Google Cloud
+          gcloud auth activate-service-account --key-file=${iconic-scholar-449915-e6-d764020d275b.json}
+          
+          # Run the BigQuery SQL query
+          gcloud bq query --use_legacy_sql=false 'SELECT * FROM `iconic-scholar-449915-e6.menaga.student`'
+
+timeout: 1200s
+
