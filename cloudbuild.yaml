@@ -5,7 +5,7 @@ steps:
     secretEnv: ['SERVICE_ACCOUNT_KEY']  # Use secret from Secret Manager
     entrypoint: 'bash'
     args:
-      - '-c'
+      - -c
       - |
         echo "$$SERVICE_ACCOUNT_KEY" > /workspace/service-account-key.json
         echo "✅ Secret saved to /workspace/service-account-key.json"
@@ -15,7 +15,7 @@ steps:
     id: 'authenticate'
     entrypoint: 'bash'
     args:
-      - '-c'
+      - -c
       - |
         gcloud auth activate-service-account --key-file=/workspace/service-account-key.json
         gcloud config set project $PROJECT_ID
@@ -26,7 +26,7 @@ steps:
     id: 'run-query'
     entrypoint: 'bash'
     args:
-      - '-c'
+      - -c
       - |
         bq query --use_legacy_sql=false 'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10'
         echo "✅ BigQuery query executed successfully"
