@@ -1,4 +1,3 @@
-#Access the id_github file from the secret manager
 steps:
 
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -7,7 +6,7 @@ steps:
       - '-c'
       - |
         # Fetch the service account key from Secret Manager
-        SECRET_KEY=$(gcloud secrets versions access latest --secret="serviceaccount")
+        SECRET_KEY=$(gcloud secrets versions access latest --secret="my-service-account-key")
 
         # Save the secret to a file
         echo $SECRET_KEY > /workspace/service-account-key.json
