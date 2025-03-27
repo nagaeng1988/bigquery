@@ -1,24 +1,41 @@
 steps:
+  # Step 1: Fetch the secret and write it to a file
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'fetch-secret'
+    secretEnv: ['my-service-account-key']  # Use secret from Secret Manager
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "$my-service-account-key" > /workspace/service-account-key.json
+        echo "✅ Secret saved to /workspace/service-account-key.json"
 
-  - name: 'gcr.io/cloud-builders/gcloud'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        # Fetch the service account key from Secret Manager
-        SECRET_KEY=$$(gcloud secrets versions access latest --secret="my-service-account-key")
+  # Step 2: Authenticate using the service account key
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'authenticate'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud auth activate-service-account --key-file=/workspace/service-account-key.json
+        gcloud config set project $PROJECT_ID
+        echo "✅ Authenticated successfully"
 
-        # Save the secret to a file
-        echo $SECRET_KEY > /workspace/service-account-key.json
+  # Step 3: Run BigQuery query
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'run-query'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        bq query --use_legacy_sql=false 'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10'
+        echo "✅ BigQuery query executed successfully"
 
-        # Authenticate with the service account
-        gcloud auth activate-service-account --key-file=/workspace/service-account-key.json
-        
-        # Set the project ID
-        gcloud config set project $PROJECT_ID
-        
-        # Run the BigQuery query
-        bq query --use_legacy_sql=false 'SELECT * FROM `iconic-scholar-449915-e6.menaga.student` LIMIT 10'
-        
+# Define the secret manager reference
+availableSecrets:
+  secretManager:
+    - versionName: projects/12182601552/secrets/my-service-account-key/versions/1
+      env: 'my-service-account-key'
+
 options:
-  logging: NONE 
+  logging: NONE
