@@ -8,7 +8,6 @@ steps:
       - '-c'
       - |
         echo "$$SERVICE_ACCOUNT_KEY" > /workspace/service-account-key.json
-        chmod 400 /workspace/service-account-key.json
         echo "✅ Secret saved to /workspace/service-account-key.json"
 
   # Step 2: Authenticate using the service account key
