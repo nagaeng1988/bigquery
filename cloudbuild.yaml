@@ -21,5 +21,3 @@ steps:
         # Run the BigQuery query
         bq query --use_legacy_sql=false 'SELECT * FROM `iconic-scholar-449915-e6.menaga.student` LIMIT 10'
         
-  timeout: 600s
-
