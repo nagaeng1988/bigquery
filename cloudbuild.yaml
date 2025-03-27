@@ -1,49 +1,5 @@
 #Access the id_github file from the secret manager
 steps:
-  - name: 'gcr.io/cloud-builders/git'
-    secretEnv: [ 'SSH_KEY']
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "$$SSH_KEY" >> /root/.ssh/id_rsa
-        chmod 400 /root/.ssh/id_rsa
-        cp known_hosts.github /root/.ssh/known_hosts
-    volumes:
-    - name: 'ssh'
-      path: /root/.ssh
-
-#clone the repository
-
-  - name: 'google/cloud-sdk'
-    entrypoint: 'bash'
-    args:
-    - -c
-    - |
-      git clone --recurse-submodules git@github.com:nagaeng1988/bigquery.git
-      cd bigquery
-      git checkout main
-      
-
-      #install the big query
-      apt-get update && apt-get install -y python3-venv
-      
-      python3 -m venv /workspace/venv
-      source /workspace/venv/bin/activate
-
-      pip install google-cloud-bigquery
-
-    timeout: 10000s
-    volumes:
-    - name: 'ssh'
-      path: /root/.ssh
-
-  availableSecrets:
-    secretManager:
-    - versionName: projects/12182601552/secrets/github/versions/1
-      env: 'SSH_KEY'
-  timeout: 10000s
-
 
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
