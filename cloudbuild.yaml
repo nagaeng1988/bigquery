@@ -32,7 +32,6 @@ steps:
       source /workspace/venv/bin/activate
 
       pip install google-cloud-bigquery
-      SELECT * FROM `iconic-scholar-449915-e6.menaga.student;
 
     timeout: 10000s
     volumes:
@@ -44,3 +43,27 @@ steps:
     - versionName: projects/12182601552/secrets/github/versions/1
       env: 'SSH_KEY'
   timeout: 10000s
+
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Fetch the service account key from Secret Manager
+        SECRET_KEY=$(gcloud secrets versions access latest --secret="serviceaccount")
+
+        # Save the secret to a file
+        echo $SECRET_KEY > /workspace/service-account-key.json
+
+        # Authenticate with the service account
+        gcloud auth activate-service-account --key-file=/workspace/service-account-key.json
+        
+        # Set the project ID
+        gcloud config set project $PROJECT_ID
+        
+        # Run the BigQuery query
+        bq query --use_legacy_sql=false 'SELECT * FROM `iconic-scholar-449915-e6.menaga.student` LIMIT 10'
+        
+  timeout: 600s
+
