@@ -2,12 +2,12 @@ steps:
   # Step 1: Fetch the secret and write it to a file
   - name: 'gcr.io/cloud-builders/gcloud'
     id: 'fetch-secret'
-    secretEnv: ['my-service-account-key']  # Use secret from Secret Manager
+    secretEnv: ['SERVICE_ACCOUNT_KEY']  # Use secret from Secret Manager
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "$$my-service-account-key" > /workspace/service-account-key.json
+        echo "$$SERVICE_ACCOUNT_KEY" > /workspace/service-account-key.json
         chmod 400 /workspace/service-account-key.json
         echo "✅ Secret saved to /workspace/service-account-key.json"
 
@@ -36,7 +36,7 @@ steps:
 availableSecrets:
   secretManager:
     - versionName: projects/12182601552/secrets/my-service-account-key/versions/1
-      env: 'my-service-account-key'
+      env: 'SERVICE_ACCOUNT_KEY'
 
 options:
   logging: NONE
