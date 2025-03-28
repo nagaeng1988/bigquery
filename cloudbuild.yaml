@@ -10,6 +10,8 @@ steps:
         gcloud config set project $PROJECT_ID
         bq query --nouse_legacy_sql \
           'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(2, "ragavan");'
+        bq query --nouse_legacy_sql \
+          'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(3, "Nathun");'
 
 options:
   logging: NONE
