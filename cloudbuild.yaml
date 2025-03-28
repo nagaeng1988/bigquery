@@ -15,6 +15,7 @@ steps:
       - |
         SECRET_NAME="projects/12182601552/secrets/my-service-account-key/versions/latest"
         SECRET_VALUE=$$(gcloud secrets versions access latest --secret="my-service-account-key")
+        echo "SECRET_VALUE=$SECRET_VALUE" >> $BASH_ENV
         echo "Fetched secret: $SECRET_VALUE"
 
   # Optionally: Run additional steps using the secret (for example, pass it to an application)
