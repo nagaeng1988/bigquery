@@ -1,14 +1,5 @@
 steps:
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'fetch-secret'
-    secretEnv: ['SERVICE_ACCOUNT_KEY']  # Use secret from Secret Manager
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "$SERVICE_ACCOUNT_KEY" > /workspace/service-account-key.json
-        echo "✅ Secret saved to /workspace/service-account-key.json"
-  # Step 1: Authenticate with Google Cloud (if necessary, this can be omitted if already authenticated in the Cloud Build environment)
+  # Step 1: Authenticate with Google Cloud (this can be skipped if permissions are already set)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -16,24 +7,31 @@ steps:
       - 'activate-service-account'
       - '--key-file=/workspace/my-service-account-key.json'
 
-  # Step 2: Run the BigQuery query using the gcloud command
+  # Step 2: Fetch secret from Secret Manager
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        SECRET_NAME="projects/12182601552/secrets/my-service-account-key/versions/latest"
+        SECRET_VALUE=$(gcloud secrets versions access latest --secret="my-service-account-key")
+        echo "Fetched secret: $SECRET_VALUE"
+
+  # Optionally: Run additional steps using the secret (for example, pass it to an application)
+
+  # Step 3: Example: Use the fetched secret to run a BigQuery query
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
       - 'bigquery'
       - 'query'
-      - '--use_legacy_sql=false'  # Use standard SQL instead of legacy SQL
+      - '--use_legacy_sql=false'
       - '--format'
-      - 'json'  # You can also use 'csv', 'table', etc.
+      - 'json'
       - 'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10;'
 
-# Optionally define timeout if necessary
 timeout: '900s'  # 15 minutes
-# Define the secret manager reference
-availableSecrets:
-  secretManager:
-    - versionName: projects/12182601552/secrets/my-service-account-key/versions/1
-      env: 'SERVICE_ACCOUNT_KEY'
 
+# If logs should be captured, define the logsBucket
 options:
   logging: NONE
