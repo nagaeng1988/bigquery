@@ -1,26 +1,4 @@
 steps:
-  # Step 1: Fetch the secret and write it to a file
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'fetch-secret'
-  secretEnv: ['SERVICE_ACCOUNT_KEY']  # Use secret from Secret Manager
-  entrypoint: 'bash'
-  args:
-      - -c
-      - |
-        echo "$$SERVICE_ACCOUNT_KEY" > /workspace/service-account-key.json
-        echo "✅ Secret saved to /workspace/service-account-key.json"
-
-  # Step 2: Authenticate using the service account key
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'authenticate'
-  entrypoint: 'bash'
-  args:
-      - -c
-      - |
-        gcloud auth activate-service-account --key-file=/workspace/service-account-key.json
-        gcloud config set project $PROJECT_ID
-        echo "✅ Authenticated successfully"
-
   # Step 3: Run BigQuery query
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'run-query'
