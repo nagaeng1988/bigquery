@@ -4,6 +4,7 @@ steps:
     args:
       - '-c'
       - |
+        set -x
         echo "Fetching credentials from Secret Manager..."
         gcloud secrets versions access latest --secret="bigquery-service-account-key" > /workspace/key.json
         gcloud auth activate-service-account --key-file /workspace/key.json
