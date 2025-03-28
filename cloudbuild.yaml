@@ -9,7 +9,10 @@ steps:
         gcloud auth activate-service-account --key-file /workspace/key.json
         gcloud config set project $PROJECT_ID
         #gsutil cp gs://mybuckettostorage/query.sql /workspace/query.sql
-        bq query --nouse_legacy_sql < /workspace/query.sql
+        for sql_file in /workspace/*.sql; do
+          echo "Running SQL query from $sql_file..."
+          bq query --nouse_legacy_sql < "$sql_file"
+        done
         #bq query --nouse_legacy_sql \
         #  'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(2, "ragavan");'
         #bq query --nouse_legacy_sql \
