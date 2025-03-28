@@ -11,3 +11,5 @@ steps:
         bq query --nouse_legacy_sql \
           'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10;'
 
+options:
+  logging: NONE
