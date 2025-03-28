@@ -9,7 +9,7 @@ steps:
         gcloud auth activate-service-account --key-file /workspace/key.json
         gcloud config set project $PROJECT_ID
         bq query --nouse_legacy_sql \
-          'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10;'
+          'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(2, "ragavan");'
 
 options:
   logging: NONE
