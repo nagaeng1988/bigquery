@@ -33,5 +33,4 @@ steps:
 timeout: '900s'  # 15 minutes
 
 # If logs should be captured, define the logsBucket
-options:
-  logging: NONE
+logsBucket: 'gs://menagastoragebucket'
