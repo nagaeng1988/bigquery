@@ -1,14 +1,34 @@
 steps:
-  # Step 3: Run BigQuery query
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: 'run-query'
-  entrypoint: 'bash'
-  args:
-      - -c
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'fetch-secret'
+    secretEnv: ['SERVICE_ACCOUNT_KEY']  # Use secret from Secret Manager
+    entrypoint: 'bash'
+    args:
+      - '-c'
       - |
-        bq query --use_legacy_sql=false 'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10'
-        echo "✅ BigQuery query executed successfully"
+        echo "$SERVICE_ACCOUNT_KEY" > /workspace/service-account-key.json
+        echo "✅ Secret saved to /workspace/service-account-key.json"
+  # Step 1: Authenticate with Google Cloud (if necessary, this can be omitted if already authenticated in the Cloud Build environment)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'auth'
+      - 'activate-service-account'
+      - '--key-file=/workspace/my-service-account-key.json'
 
+  # Step 2: Run the BigQuery query using the gcloud command
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'bigquery'
+      - 'query'
+      - '--use_legacy_sql=false'  # Use standard SQL instead of legacy SQL
+      - '--format'
+      - 'json'  # You can also use 'csv', 'table', etc.
+      - 'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10;'
+
+# Optionally define timeout if necessary
+timeout: '900s'  # 15 minutes
 # Define the secret manager reference
 availableSecrets:
   secretManager:
