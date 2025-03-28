@@ -8,10 +8,12 @@ steps:
         gcloud secrets versions access latest --secret="bigquery-service-account-key" > /workspace/key.json
         gcloud auth activate-service-account --key-file /workspace/key.json
         gcloud config set project $PROJECT_ID
-        bq query --nouse_legacy_sql \
-          'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(2, "ragavan");'
-        bq query --nouse_legacy_sql \
-          'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(3, "Nathun");'
+        gsutil cp gs://mybuckettostorage/query.sql /workspace/query.sql
+        bq query --nouse_legacy_sql < /workspace/query.sql
+        #bq query --nouse_legacy_sql \
+        #  'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(2, "ragavan");'
+        #bq query --nouse_legacy_sql \
+        #  'INSERT INTO iconic-scholar-449915-e6.menaga.student (studid, studname) VALUES(3, "Nathun");'
 
 options:
   logging: NONE
