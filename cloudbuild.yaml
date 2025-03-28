@@ -1,37 +1,13 @@
 steps:
-  # Step 1: Authenticate with Google Cloud (this can be skipped if permissions are already set)
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - 'auth'
-      - 'activate-service-account'
-      - '--key-file=/workspace/my-service-account-key.json'
-
-  # Step 2: Fetch secret from Secret Manager
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        SECRET_NAME="projects/12182601552/secrets/my-service-account-key/versions/latest"
-        SECRET_VALUE=$$(gcloud secrets versions access latest --secret="my-service-account-key")
-        echo "SECRET_VALUE=$SECRET_VALUE" >> $BASH_ENV
-        echo "Fetched secret: $SECRET_VALUE"
+        echo "Fetching credentials from Secret Manager..."
+        gcloud secrets versions access latest --secret="bigquery-service-account-key" > /workspace/key.json
+        gcloud auth activate-service-account --key-file /workspace/key.json
+        gcloud config set project $PROJECT_ID
+        bq query --nouse_legacy_sql \
+          'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10;'
 
-  # Optionally: Run additional steps using the secret (for example, pass it to an application)
-
-  # Step 3: Example: Use the fetched secret to run a BigQuery query
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - 'bigquery'
-      - 'query'
-      - '--use_legacy_sql=false'
-      - '--format'
-      - 'json'
-      - 'SELECT * FROM iconic-scholar-449915-e6.menaga.student LIMIT 10;'
-
-timeout: '900s'  # 15 minutes
-
-# If logs should be captured, define the logsBucket
-logsBucket: 'gs://menagastoragebucket'
